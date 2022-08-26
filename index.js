@@ -60,7 +60,6 @@ app.post('/posts/:post_id/comments', (req, res) => {
 })
 
 //TODO DELETE   	/posts/:post_id/comments/:comment_id (delete comment from post)
-//TODO DELETE   	/posts/:post_id (delete post)
 app.delete('/posts/:post_id/comments/:comment_id', (req, res) => {
     var post_id = req.params.post_id;
     var comment_id = req.params.comment_id;
