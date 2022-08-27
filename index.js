@@ -8,21 +8,21 @@ app.use(bodyParser.json())
 
 
 //TODO POST 	/posts     add ( add post )
-app.post('/posts', (req, res) => {
+app.post('/posts', async(req, res) => {
     var title = req.body.title;
     var description = req.body.description;
-    var post = Posts.add({ title, description })
+    var post = await Posts.add({ title, description })
     res.send(post)
 })
 //TODO GET  	/posts ( list posts )
-app.get('/posts', (req, res) => {
-    var posts = Posts.list();
+app.get('/posts', async (req, res) => {
+    var posts = await Posts.list();
     res.send(posts)
 })
 //TODO GET  	/posts/:post_id ( get post )
-app.get('/posts/:post_id', (req,res) => {
+app.get('/posts/:post_id', async (req,res) => {
     var post_id = req.params.post_id;
-    var post = Posts.getPostById(post_id);
+    var post = await Posts.getPostById(post_id);
 
     if (post){
         res.send(post)
@@ -31,18 +31,18 @@ app.get('/posts/:post_id', (req,res) => {
     }
 })
 //TODO DELETE   	/posts/:post_id (delete post)
-app.delete('/posts/:post_id', (req,res) => {
+app.delete('/posts/:post_id', async (req,res) => {
     var post_id = req.params.post_id;
-    Posts.deletePostById(post_id)
+    await Posts.deletePostById(post_id)
     res.send({})
 })
 
 //TODO PUT      	/posts/:post_id (edit post)
-app.put('/posts/:post_id', (req,res) => {
+app.put('/posts/:post_id', async (req,res) => {
     var post_id = req.params.post_id;
     var title = req.body.title;
     var description = req.body.description;
-    var post = Posts.editPost({ id: post_id, title, description })
+    var post = await Posts.editPost({ id: post_id, title, description })
     if (post){
         res.send(post)
     } else {

@@ -1,59 +1,45 @@
-var posts = [];
-var post_id_counter = 1;
-var comment_id_counter = 1;
 const fs = require('fs')
+const database = require('./db.js')
+const { ObjectId } = require('mongodb')
 
-function loadDatabase() {
-    if(fs.existsSync('data.json')){
-        var data = fs.readFileSync('data.json', 'utf-8');
-        var jsonData = JSON.parse(data);
-        posts = jsonData.posts;
-        post_id_counter = jsonData.post_id_counter;
-        comment_id_counter = jsonData.comment_id_counter
-
-    }
-}
-
-loadDatabase()
-
-function updateDatabase() {
-    fs.writeFileSync(
-        'data.json',
-        JSON.stringify({ posts, post_id_counter, comment_id_counter }),
-    )
-}
 function add({ title, description }) {
-    var post = {
-        id: post_id_counter,
+
+    var post = database.collection('posts').insertOne({
         title: title,
         description: description,
         comments: []
-    }
-    posts.push(post);
-    post_id_counter++;
-    updateDatabase();
+    })
+
     return post
 }
 
 function list() {
+    const posts = database.collection('posts').find().toArray()
     return posts
 }
 
 function getPostById(id) {
-    var post = posts.find(post => post.id == id)
+    var post = database.collection('posts')
+        .findOne({ _id: ObjectId(id) })
     return post
 }
 
 function deletePostById(id) {
-    posts = posts.filter(post => post.id != id)
-    return posts
+    database.collection('posts').deleteOne({ _id: ObjectId(id) })
+    return {}
 }
 
-function editPost({ id, title, description }) {
-    var post = getPostById(id);
-    if (!post) return undefined
-    if (title) post.title = title;
-    if (description) post.description = description;
+async function editPost({ id, title, description }) {
+    var post = await database.collection('posts')
+        .findOne({ _id: ObjectId(id) })
+        
+    post = await database.collection('posts').updateOne({ _id: ObjectId(id) }, {
+        $set: {
+            title: title || post.title,
+            description: description || post.description,
+        }
+    })
+    
     return post
 }
 
